@@ -1,0 +1,65 @@
+# PayBridgeNP WHMCS — local development stack.
+#
+# Usage:
+#   1. Download your WHMCS release zip (with a valid dev license) and
+#      extract it into `docker/whmcs-src/` — that dir is gitignored.
+#   2. `docker compose up -d`
+#   3. Open http://localhost:8080 and run the WHMCS installer once.
+#   4. Activate the "PayBridgeNP" gateway under Payments — the live-mount
+#      exposes your in-progress module files without a rebuild.
+#
+# Webhook tunneling:
+#   PayBridge's webhooks need a public URL. After `compose up`, run:
+#     cloudflared tunnel --url http://localhost:8080
+#   then set the printed https URL as the WHMCS System URL under
+#   Configuration → System Settings → General, so callback URLs resolve
+#   externally.
+
+services:
+  whmcs:
+    # Built from Dockerfile.whmcs: PHP 8.2 + ionCube + Apache.
+    # Dev-only; never run in production.
+    build:
+      context: .
+      dockerfile: Dockerfile.whmcs
+    image: paybridgenp-whmcs-dev
+    container_name: paybridgenp-whmcs
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      # WHMCS source, provided by the developer (gitignored)
+      - ./whmcs-src:/var/www/whmcs
+      # Live-mount our module directly into the WHMCS modules dir. Any edit
+      # to the .php files is reflected on the next request — no rebuild.
+      - ../modules/gateways/paybridgenp.php:/var/www/whmcs/modules/gateways/paybridgenp.php:ro
+      - ../modules/gateways/paybridgenp:/var/www/whmcs/modules/gateways/paybridgenp:ro
+      - ../modules/gateways/callback/paybridgenp.php:/var/www/whmcs/modules/gateways/callback/paybridgenp.php:ro
+    environment:
+      VIRTUAL_HOST: localhost
+      MYSQL_HOST: db
+      MYSQL_USER: whmcs
+      MYSQL_PASSWORD: whmcs
+      MYSQL_DATABASE: whmcs
+    depends_on:
+      - db
+
+  db:
+    image: mariadb:10.11
+    container_name: paybridgenp-whmcs-db
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: whmcs
+      MARIADB_DATABASE: whmcs
+      MARIADB_USER: whmcs
+      MARIADB_PASSWORD: whmcs
+    volumes:
+      - ./db-data:/var/lib/mysql
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: paybridgenp-whmcs-mailhog
+    restart: unless-stopped
+    ports:
+      - "8025:8025"   # Web UI
+      - "1025:1025"   # SMTP (point WHMCS at host=mailhog, port=1025)

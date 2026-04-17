@@ -1,0 +1,37 @@
+{
+  "name": "paybridge-np/whmcs",
+  "description": "PayBridgeNP WHMCS gateway module — accept eSewa and Khalti inside WHMCS with a single integration.",
+  "type": "whmcs-module",
+  "license": "GPL-2.0-or-later",
+  "homepage": "https://paybridgenp.com",
+  "keywords": ["whmcs", "paybridge", "nepal", "esewa", "khalti", "payment-gateway"],
+  "require": {
+    "php": ">=7.4",
+    "ext-curl": "*",
+    "ext-json": "*",
+    "paybridge-np/sdk": "^1.3"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "PayBridgeNP\\WHMCS\\": "modules/gateways/paybridgenp/src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "PayBridgeNP\\WHMCS\\Tests\\": "tests/"
+    }
+  },
+  "config": {
+    "sort-packages": true,
+    "optimize-autoloader": true,
+    "preferred-install": "dist"
+  },
+  "scripts": {
+    "test": "vendor/bin/phpunit",
+    "package": "bash scripts/package.sh"
+  },
+  "minimum-stability": "stable"
+}

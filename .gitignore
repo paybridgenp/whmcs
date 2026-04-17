@@ -1,0 +1,22 @@
+# Vendored SDK — shipped inside the distribution zip but regenerated via composer install
+modules/gateways/paybridgenp/vendor/
+
+# Root-level composer lockfile + dev vendor (phpunit, etc.)
+composer.lock
+vendor/
+
+# Build artefacts
+dist/
+*.zip
+
+# Local WHMCS source for Docker dev loop (never commit)
+docker/whmcs-src/
+docker/db-data/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+
+# PHPUnit result cache
+.phpunit.result.cache

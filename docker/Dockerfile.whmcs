@@ -1,0 +1,63 @@
+# Dev-only WHMCS runtime image — PHP 8.2 + Apache + ionCube.
+# WHMCS 8.13 requires PHP 8.1/8.2/8.3 and ionCube Loader.
+# Not intended for production.
+
+FROM php:8.2-apache
+
+# ── System deps for PHP extensions WHMCS needs ───────────────────────────────
+# IMAP intentionally omitted — only used for WHMCS support-ticket pipe-in,
+# not exercised in gateway tests.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libcurl4-openssl-dev \
+        libfreetype6-dev \
+        libjpeg-dev \
+        libpng-dev \
+        libzip-dev \
+        libicu-dev \
+        libxml2-dev \
+        libonig-dev \
+        zlib1g-dev \
+        unzip \
+        curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# ── PHP extensions ───────────────────────────────────────────────────────────
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+ && docker-php-ext-install -j$(nproc) \
+        bcmath \
+        curl \
+        gd \
+        intl \
+        mbstring \
+        mysqli \
+        pdo_mysql \
+        soap \
+        xml \
+        zip
+
+# ── ionCube Loader ───────────────────────────────────────────────────────────
+# WHMCS ships encoded with ionCube; the loader must be present or admin pages 500.
+RUN set -eux; \
+    ARCH="$(uname -m)"; \
+    case "$ARCH" in \
+        x86_64)  LOADER_ARCHIVE="ioncube_loaders_lin_x86-64.tar.gz" ;; \
+        aarch64) LOADER_ARCHIVE="ioncube_loaders_lin_aarch64.tar.gz" ;; \
+        *) echo "unsupported arch: $ARCH" >&2; exit 1 ;; \
+    esac; \
+    curl -fsSL "https://downloads.ioncube.com/loader_downloads/$LOADER_ARCHIVE" -o /tmp/ioncube.tar.gz; \
+    tar xzf /tmp/ioncube.tar.gz -C /tmp; \
+    EXT_DIR="$(php -r 'echo ini_get("extension_dir");')"; \
+    cp /tmp/ioncube/ioncube_loader_lin_8.2.so "$EXT_DIR/"; \
+    echo "zend_extension=ioncube_loader_lin_8.2.so" > /usr/local/etc/php/conf.d/00-ioncube.ini; \
+    rm -rf /tmp/ioncube /tmp/ioncube.tar.gz
+
+# ── Apache: DocumentRoot = /var/www/whmcs, enable rewrites ───────────────────
+RUN sed -ri -e 's!/var/www/html!/var/www/whmcs!g' /etc/apache2/sites-available/*.conf \
+ && a2enmod rewrite
+
+# Sane PHP limits for WHMCS
+RUN echo "memory_limit = 512M\nupload_max_filesize = 64M\npost_max_size = 64M" \
+        > /usr/local/etc/php/conf.d/whmcs.ini
+
+WORKDIR /var/www/whmcs
+EXPOSE 80
