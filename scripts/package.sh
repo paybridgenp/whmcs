@@ -56,7 +56,7 @@ cat > "$MODULE_DIR/composer.json" <<'EOF'
     "php": ">=7.4",
     "ext-curl": "*",
     "ext-json": "*",
-    "paybridge-np/sdk": "^1.3"
+    "paybridge-np/sdk": "^3.0"
   },
   "autoload": {
     "psr-4": {
