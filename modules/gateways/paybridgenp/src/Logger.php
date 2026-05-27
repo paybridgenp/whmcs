@@ -75,7 +75,7 @@ final class Logger
         $redactKeys = [
             'api_key', 'apikey', 'secret', 'secretKey', 'testSecretKey',
             'webhookSecret', 'signing_secret', 'authorization',
-            'x-paybridge-signature', 'X-PayBridge-Signature',
+            'x-paybridge-signature', 'X-PayBridgeNP-Signature',
         ];
 
         $out = [];

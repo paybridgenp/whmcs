@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace PayBridgeNP\WHMCS\Tests;
 
-use PayBridgeNP\PayBridge;
+use PayBridgeNP\PayBridgeNP;
 use PayBridgeNP\Exceptions\SignatureVerificationException;
 use PHPUnit\Framework\TestCase;
 
@@ -34,7 +34,7 @@ final class WebhookSignatureTest extends TestCase
         ]);
         $sig = $this->sign($payload, time());
 
-        $event = PayBridge::webhooks()->constructEvent($payload, $sig, self::SECRET);
+        $event = PayBridgeNP::webhooks()->constructEvent($payload, $sig, self::SECRET);
         $this->assertSame('payment.succeeded',  $event['type']);
         $this->assertSame('42',                  $event['data']['metadata']['invoiceid']);
     }
@@ -42,7 +42,7 @@ final class WebhookSignatureTest extends TestCase
     public function test_rejects_missing_header(): void
     {
         $this->expectException(SignatureVerificationException::class);
-        PayBridge::webhooks()->constructEvent('{"a":1}', null, self::SECRET);
+        PayBridgeNP::webhooks()->constructEvent('{"a":1}', null, self::SECRET);
     }
 
     public function test_rejects_tampered_payload(): void
@@ -52,7 +52,7 @@ final class WebhookSignatureTest extends TestCase
         $tampered  = '{"a":2}';
 
         $this->expectException(SignatureVerificationException::class);
-        PayBridge::webhooks()->constructEvent($tampered, $sig, self::SECRET);
+        PayBridgeNP::webhooks()->constructEvent($tampered, $sig, self::SECRET);
     }
 
     public function test_rejects_wrong_secret(): void
@@ -61,7 +61,7 @@ final class WebhookSignatureTest extends TestCase
         $sig     = $this->sign($payload, time());
 
         $this->expectException(SignatureVerificationException::class);
-        PayBridge::webhooks()->constructEvent($payload, $sig, 'whsec_wrong');
+        PayBridgeNP::webhooks()->constructEvent($payload, $sig, 'whsec_wrong');
     }
 
     public function test_rejects_replay_outside_five_minute_window(): void
@@ -70,12 +70,12 @@ final class WebhookSignatureTest extends TestCase
         $oldSig    = $this->sign($payload, time() - 600); // 10 min ago
 
         $this->expectException(SignatureVerificationException::class);
-        PayBridge::webhooks()->constructEvent($payload, $oldSig, self::SECRET);
+        PayBridgeNP::webhooks()->constructEvent($payload, $oldSig, self::SECRET);
     }
 
     public function test_rejects_malformed_header(): void
     {
         $this->expectException(SignatureVerificationException::class);
-        PayBridge::webhooks()->constructEvent('{"a":1}', 'not a real header', self::SECRET);
+        PayBridgeNP::webhooks()->constructEvent('{"a":1}', 'not a real header', self::SECRET);
     }
 }

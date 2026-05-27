@@ -63,16 +63,16 @@ docker compose exec whmcs rm -rf /var/www/whmcs/install
 
 ## 6. Tunnel for webhooks
 
-PayBridge webhooks can't reach `localhost`. Start cloudflared in another tab:
+PayBridgeNP webhooks can't reach `localhost`. Start cloudflared in another tab:
 
 ```bash
 cloudflared tunnel --url http://localhost:8080
 # → https://<random>.trycloudflare.com
 ```
 
-Update WHMCS **Configuration → System Settings → General → WHMCS System URL** to that tunnel URL so both the return URL we generate and the webhook URL in PayBridge resolve externally.
+Update WHMCS **Configuration → System Settings → General → WHMCS System URL** to that tunnel URL so both the return URL we generate and the webhook URL in PayBridgeNP resolve externally.
 
-In the PayBridge dashboard, register a webhook pointing at:
+In the PayBridgeNP dashboard, register a webhook pointing at:
 ```
 https://<tunnel-url>/modules/gateways/callback/paybridgenp.php
 ```

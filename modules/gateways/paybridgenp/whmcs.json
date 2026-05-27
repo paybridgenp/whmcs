@@ -7,7 +7,7 @@
   "description": {
     "name": "PayBridgeNP",
     "tagline": "One integration for every Nepali payment method.",
-    "long": "## The fastest way to accept Nepali payments in WHMCS.\n\nPayBridgeNP is a payment aggregator for Nepal. Install this module once and your customers can pay WHMCS invoices with **eSewa**, **Khalti**, and any method PayBridge adds in the future — no second configuration, no second reconciliation.\n\nPayments are collected on a hosted, mobile-friendly checkout page. Server-to-server webhooks (HMAC-signed) are the authoritative confirmation, so invoices are marked paid even if a customer closes their browser on the redirect back.\n\nSign up at [paybridgenp.com](https://paybridgenp.com). Setup walkthrough at [docs.paybridgenp.com/integrations/whmcs](https://docs.paybridgenp.com/integrations/whmcs).",
+    "long": "## The fastest way to accept Nepali payments in WHMCS.\n\nPayBridgeNP is a payment aggregator for Nepal. Install this module once and your customers can pay WHMCS invoices with **eSewa**, **Khalti**, and any method PayBridgeNP adds in the future — no second configuration, no second reconciliation.\n\nPayments are collected on a hosted, mobile-friendly checkout page. Server-to-server webhooks (HMAC-signed) are the authoritative confirmation, so invoices are marked paid even if a customer closes their browser on the redirect back.\n\nSign up at [paybridgenp.com](https://paybridgenp.com). Setup walkthrough at [docs.paybridgenp.com/integrations/whmcs](https://docs.paybridgenp.com/integrations/whmcs).",
     "features": [
       "eSewa + Khalti in one module — no per-method configuration, no duplicate webhook endpoints.",
       "Full refund support from inside WHMCS admin, including partial refunds.",

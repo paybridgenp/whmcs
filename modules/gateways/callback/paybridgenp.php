@@ -4,12 +4,12 @@
  *
  * Two distinct HTTP flows land here:
  *
- *   1) Browser return URL.  PayBridge appends ?session_id=…&status=…&payment_id=…
+ *   1) Browser return URL.  PayBridgeNP appends ?session_id=…&status=…&payment_id=…
  *      to the return_url we passed when creating the checkout session. We show
  *      the customer a WHMCS-native page (invoice or checkout) depending on status.
  *
- *   2) Server-to-server webhook.  PayBridge POSTs a signed JSON body with an
- *      X-PayBridge-Signature header. This is the *authoritative* confirmation
+ *   2) Server-to-server webhook.  PayBridgeNP POSTs a signed JSON body with an
+ *      X-PayBridgeNP-Signature header. This is the *authoritative* confirmation
  *      that moves the invoice to paid — it is idempotent by payment id.
  *
  * We detect which flow we're in by the presence of the signature header.
@@ -23,7 +23,7 @@
 
 declare(strict_types=1);
 
-use PayBridgeNP\PayBridge;
+use PayBridgeNP\PayBridgeNP;
 use PayBridgeNP\Exceptions\SignatureVerificationException;
 use PayBridgeNP\WHMCS\Amount;
 use PayBridgeNP\WHMCS\Config;
@@ -75,7 +75,7 @@ function paybridgenp_handle_webhook(Config $config, Logger $logger): void
     }
 
     try {
-        $event = PayBridge::webhooks()->constructEvent($payload, $signature, $secret);
+        $event = PayBridgeNP::webhooks()->constructEvent($payload, $signature, $secret);
     } catch (SignatureVerificationException $e) {
         $logger->error('webhook.invalid_signature', [
             'message' => $e->getMessage(),
@@ -102,7 +102,7 @@ function paybridgenp_handle_webhook(Config $config, Logger $logger): void
             break;
 
         default:
-            // Unknown event types are 200'd so PayBridge doesn't retry forever.
+            // Unknown event types are 200'd so PayBridgeNP doesn't retry forever.
             $logger->info('webhook.ignored', ['type' => $type], 'Info');
             break;
     }
@@ -135,7 +135,7 @@ function paybridgenp_apply_success(array $data, Config $config, Logger $logger):
     // checkCbInvoiceID returns the validated id or dies with a logged error.
     $invoiceId = checkCbInvoiceID($invoiceId, $config->gatewayName());
 
-    // Guard: dedupe by PayBridge payment id. If the same webhook is re-delivered
+    // Guard: dedupe by PayBridgeNP payment id. If the same webhook is re-delivered
     // (or the browser-return path ever applies a payment in a future revision),
     // checkCbTransID bails silently before we double-credit.
     checkCbTransID($paymentId);

@@ -8,7 +8,7 @@
  *
  *   paybridgenp_MetaData() — display name, refund/link-to-invoice support
  *   paybridgenp_config()   — admin config fields
- *   paybridgenp_link()     — returns HTML form that redirects to PayBridge checkout
+ *   paybridgenp_link()     — returns HTML form that redirects to PayBridgeNP checkout
  *   paybridgenp_refund()   — issues refunds via the php-sdk
  *
  * The user-facing return URL and server-to-server webhook both land on
@@ -28,7 +28,7 @@ if (!defined('WHMCS')) {
 
 require_once __DIR__ . '/paybridgenp/init.php';
 
-use PayBridgeNP\PayBridge;
+use PayBridgeNP\PayBridgeNP;
 use PayBridgeNP\Exceptions\PayBridgeException;
 use PayBridgeNP\WHMCS\Amount;
 use PayBridgeNP\WHMCS\CheckoutParams;
@@ -95,7 +95,7 @@ function paybridgenp_config(): array
             'Type'         => 'text',
             'Size'         => '60',
             'Default'      => '',
-            'Description'  => 'Optional. If set, PayBridge return/webhook URLs use this base instead of the WHMCS System URL. Useful when WHMCS is behind a load balancer, or in dev with a tunnel (cloudflared/ngrok). Example: https://tunnel.example.com/',
+            'Description'  => 'Optional. If set, PayBridgeNP return/webhook URLs use this base instead of the WHMCS System URL. Useful when WHMCS is behind a load balancer, or in dev with a tunnel (cloudflared/ngrok). Example: https://tunnel.example.com/',
         ],
         'paymentMethod'  => [
             'FriendlyName' => 'Payment Method',
@@ -120,7 +120,7 @@ function paybridgenp_config(): array
 
 /**
  * Render the "Pay Now" button shown on the client-area invoice. Submitting the
- * form creates a PayBridge checkout session and redirects the customer to the
+ * form creates a PayBridgeNP checkout session and redirects the customer to the
  * hosted payment page.
  *
  * The form posts back to this same gateway file via WHMCS's standard flow,
@@ -165,7 +165,7 @@ HTML;
 }
 
 /**
- * Create a PayBridge checkout session and issue the client-side redirect.
+ * Create a PayBridgeNP checkout session and issue the client-side redirect.
  *
  * Returns HTML (required by the WHMCS gateway contract) rather than calling
  * header() + exit because WHMCS has already started output by the time
@@ -181,7 +181,7 @@ function paybridgenp_create_and_redirect(array $params, Config $config, Logger $
     }
 
     try {
-        $pb   = new PayBridge(['api_key' => $config->apiKey()]);
+        $pb   = new PayBridgeNP(['api_key' => $config->apiKey()]);
         $body = CheckoutParams::build($params, $config);
 
         $logger->debug('checkout.request', $body);
@@ -210,7 +210,7 @@ function paybridgenp_create_and_redirect(array $params, Config $config, Logger $
 
     $checkoutUrl = htmlspecialchars((string) ($session['checkout_url'] ?? ''), ENT_QUOTES);
     if ($checkoutUrl === '') {
-        return paybridgenp_error_html('PayBridge did not return a checkout URL. Please try again.');
+        return paybridgenp_error_html('PayBridgeNP did not return a checkout URL. Please try again.');
     }
 
     // Meta refresh + JS fallback. <noscript> handles JS-disabled clients.
@@ -272,9 +272,9 @@ function paybridgenp_refund(array $params): array
     }
 
     try {
-        $pb      = new PayBridge(['api_key' => $config->apiKey()]);
+        $pb      = new PayBridgeNP(['api_key' => $config->apiKey()]);
         $invoice = (int) ($params['invoiceid'] ?? 0);
-        // PayBridge requires `reason` to be one of an enum. WHMCS has no
+        // PayBridgeNP requires `reason` to be one of an enum. WHMCS has no
         // concept of refund taxonomy, so we default to `other` and put the
         // human context in `notes`.
         $request = [

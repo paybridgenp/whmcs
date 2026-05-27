@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build the merchant-installable zip for the PayBridge NP WHMCS gateway.
+# Build the merchant-installable zip for the PayBridgeNP NP WHMCS gateway.
 #
 # Output: packages/whmcs/dist/paybridgenp-whmcs-<version>.zip
 #
@@ -38,7 +38,7 @@ $src = file_get_contents($argv[1]);
 preg_match("/define\\(\\s*\x27PAYBRIDGENP_WHMCS_VERSION\x27\\s*,\\s*\x27([^\x27]+)\x27/", $src, $m);
 echo $m[1] ?? "0.0.0";
 ' "$MODULE_DIR/init.php")"
-echo "› Building PayBridge NP WHMCS module v$VERSION"
+echo "› Building PayBridgeNP NP WHMCS module v$VERSION"
 
 # ── Vendor the SDK (production-only) ─────────────────────────────────────────
 echo "› Vendoring paybridge-np/sdk into modules/gateways/paybridgenp/vendor/"
@@ -50,7 +50,7 @@ rm -rf "$MODULE_DIR/vendor"
 cat > "$MODULE_DIR/composer.json" <<'EOF'
 {
   "name": "paybridge-np/whmcs-runtime",
-  "description": "Runtime dependencies + PSR-4 autoload shipped with the PayBridge NP WHMCS module.",
+  "description": "Runtime dependencies + PSR-4 autoload shipped with the PayBridgeNP NP WHMCS module.",
   "type": "library",
   "require": {
     "php": ">=7.4",

@@ -47,7 +47,7 @@ final class Config
     }
 
     /**
-     * `auto` = let the payer pick on the PayBridge hosted page.
+     * `auto` = let the payer pick on the PayBridgeNP hosted page.
      * `esewa` / `khalti` = force a single method upstream.
      */
     public function paymentMethod(): string
@@ -82,7 +82,7 @@ final class Config
      * The override exists for two cases:
      *   - WHMCS is behind a load balancer / different public hostname than
      *     its internal SystemURL setting.
-     *   - Local dev: SystemURL is http://localhost:8080 but PayBridge needs
+     *   - Local dev: SystemURL is http://localhost:8080 but PayBridgeNP needs
      *     a cloudflared / ngrok tunnel URL to reach us.
      */
     public function callbackBaseUrl(): string

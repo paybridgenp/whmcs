@@ -9,7 +9,7 @@
 #      exposes your in-progress module files without a rebuild.
 #
 # Webhook tunneling:
-#   PayBridge's webhooks need a public URL. After `compose up`, run:
+#   PayBridgeNP's webhooks need a public URL. After `compose up`, run:
 #     cloudflared tunnel --url http://localhost:8080
 #   then set the printed https URL as the WHMCS System URL under
 #   Configuration → System Settings → General, so callback URLs resolve

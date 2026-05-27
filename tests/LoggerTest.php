@@ -43,10 +43,10 @@ final class LoggerTest extends TestCase
     public function test_scrub_redacts_signature_header_variants(): void
     {
         $cleaned = Logger::scrub([
-            'X-PayBridge-Signature' => 't=123,v1=abc',
+            'X-PayBridgeNP-Signature' => 't=123,v1=abc',
             'x-paybridge-signature' => 't=456,v1=def',
         ]);
-        $this->assertSame('[REDACTED]', $cleaned['X-PayBridge-Signature']);
+        $this->assertSame('[REDACTED]', $cleaned['X-PayBridgeNP-Signature']);
         $this->assertSame('[REDACTED]', $cleaned['x-paybridge-signature']);
     }
 }

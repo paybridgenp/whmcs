@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace PayBridgeNP\WHMCS;
 
 /**
- * WHMCS passes amounts as decimal strings formatted "xxx.xx". PayBridge's API
+ * WHMCS passes amounts as decimal strings formatted "xxx.xx". PayBridgeNP's API
  * works in paisa (NPR × 100). Do the conversion in one place so rounding is
  * consistent between checkout creation and refund submission.
  */
@@ -27,7 +27,7 @@ final class Amount
     }
 
     /**
-     * Convert paisa (from a PayBridge API response) back to rupees for display
+     * Convert paisa (from a PayBridgeNP API response) back to rupees for display
      * in order notes and the gateway log.
      */
     public static function toRupees(int $paisa): string
