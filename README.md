@@ -1,6 +1,6 @@
 # PayBridgeNP for WHMCS
 
-Official [PayBridgeNP](https://paybridgenp.com) gateway module for WHMCS. Accept **eSewa** and **Khalti** payments on invoices inside your WHMCS billing panel with a single integration and full refund support from admin.
+Official [PayBridgeNP](https://paybridgenp.com) gateway module for WHMCS. Accept **eSewa** and **Khalti** payments on invoices inside your WHMCS billing panel with a single integration, plus refunds from admin (note: eSewa refunds enter a `requires_action` state and finalize out of band, so they are not instant).
 
 <p align="center">
   <img src="modules/gateways/paybridgenp/logo.png" alt="PayBridgeNP logo" width="96" height="96" />
@@ -12,7 +12,7 @@ Official [PayBridgeNP](https://paybridgenp.com) gateway module for WHMCS. Accept
 
 ## Install in 5 minutes
 
-1. Download the latest `paybridgenp-whmcs-*.zip` from [Releases](https://github.com/paybridgenp/whmcs/releases/latest) — about 65 KB, the PayBridgeNP PHP SDK is vendored inside so you don't need Composer.
+1. Download the latest `paybridgenp-whmcs-*.zip` from [Releases](https://github.com/paybridgenp/whmcs/releases/latest) - about 65 KB, the PayBridgeNP PHP SDK is vendored inside so you don't need Composer.
 2. Extract the ZIP at the root of your WHMCS install (the directory containing `configuration.php`). Files merge into `modules/gateways/`.
 3. In WHMCS admin, go to **Configuration → System Settings → Payment Gateways → All Payment Gateways**, find **PayBridgeNP**, click **Activate**.
 4. Paste your test or live API key (`sk_test_…` / `sk_live_…`) and your webhook signing secret (`whsec_…`) from the [PayBridgeNP dashboard](https://dashboard.paybridgenp.com).
@@ -20,16 +20,16 @@ Official [PayBridgeNP](https://paybridgenp.com) gateway module for WHMCS. Accept
    ```
    https://your-whmcs-url/modules/gateways/callback/paybridgenp.php
    ```
-   Subscribe to `payment.succeeded`, `payment.failed`, and `payment.cancelled`.
+   Subscribe to `payment.succeeded` and `payment.failed`.
 
 Full setup walkthrough with screenshots: [docs.paybridgenp.com/integrations/whmcs/install](https://docs.paybridgenp.com/integrations/whmcs/install).
 
 ## Features
 
 - **eSewa + Khalti in one module.** No per-method configuration, no duplicate webhooks.
-- **Full refunds inside admin.** Click Refund on any transaction — partial refunds supported. Calls PayBridgeNP's refund API directly.
+- **Refunds inside admin.** Click Refund on any transaction - partial refunds supported. Calls PayBridgeNP's refund API directly. eSewa refunds enter `requires_action` and finalize out of band; confirm completion in the PayBridgeNP dashboard.
 - **HMAC-signed webhooks** with a 5-minute replay window. Unsigned events rejected with HTTP 400.
-- **Idempotent payment application** via `checkCbTransID` — replayed webhooks never double-post.
+- **Idempotent payment application** via `checkCbTransID` - replayed webhooks never double-post.
 - **Gateway Log integration** with automatic secret scrubbing (API keys, signatures, and signing secrets never land in the log).
 - **Optional Public Callback URL override** for installs behind a load balancer or local dev with cloudflared / ngrok tunnels.
 
@@ -99,10 +99,10 @@ Walkthrough: [`docker/README.md`](./docker/README.md).
 
 ## Support
 
-- **Documentation** — [docs.paybridgenp.com](https://docs.paybridgenp.com)
-- **Dashboard & account** — [dashboard.paybridgenp.com](https://dashboard.paybridgenp.com)
-- **Email** — [support@paybridgenp.com](mailto:support@paybridgenp.com)
-- **Issues & feature requests** — [open an issue](https://github.com/paybridgenp/whmcs/issues)
+- **Documentation** - [docs.paybridgenp.com](https://docs.paybridgenp.com)
+- **Dashboard & account** - [dashboard.paybridgenp.com](https://dashboard.paybridgenp.com)
+- **Email** - [support@paybridgenp.com](mailto:support@paybridgenp.com)
+- **Issues & feature requests** - [open an issue](https://github.com/paybridgenp/whmcs/issues)
 
 ## License
 
