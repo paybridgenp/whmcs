@@ -45,11 +45,12 @@ if (!$gateway['type']) {
 $config = new Config($gateway);
 $logger = new Logger($config);
 
-$hasSignature = !empty($_SERVER['HTTP_X_PAYBRIDGE_SIGNATURE']);
+$signature = (string) ($_SERVER['HTTP_X_PAYBRIDGENP_SIGNATURE'] ?? $_SERVER['HTTP_X_PAYBRIDGE_SIGNATURE'] ?? '');
+$hasSignature = $signature !== '';
 
 // ── Branch 1: webhook ────────────────────────────────────────────────────────
 if ($hasSignature) {
-    paybridgenp_handle_webhook($config, $logger);
+    paybridgenp_handle_webhook($config, $logger, $signature);
     exit;
 }
 
@@ -61,10 +62,9 @@ exit;
 // WEBHOOK HANDLER
 // =========================================================================
 
-function paybridgenp_handle_webhook(Config $config, Logger $logger): void
+function paybridgenp_handle_webhook(Config $config, Logger $logger, string $signature): void
 {
     $payload   = (string) file_get_contents('php://input');
-    $signature = (string) ($_SERVER['HTTP_X_PAYBRIDGE_SIGNATURE'] ?? '');
     $secret    = $config->webhookSecret();
 
     if ($secret === '') {

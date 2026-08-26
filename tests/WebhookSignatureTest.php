@@ -19,6 +19,16 @@ final class WebhookSignatureTest extends TestCase
 {
     private const SECRET = 'whsec_testsecret';
 
+    public function test_callback_reads_the_canonical_paybridgenp_header(): void
+    {
+        $source = (string) file_get_contents(__DIR__ . '/../modules/gateways/callback/paybridgenp.php');
+        $this->assertStringContainsString(
+            "\$_SERVER['HTTP_X_PAYBRIDGENP_SIGNATURE'] ?? \$_SERVER['HTTP_X_PAYBRIDGE_SIGNATURE']",
+            $source
+        );
+        $this->assertStringContainsString('paybridgenp_handle_webhook($config, $logger, $signature)', $source);
+    }
+
     private function sign(string $payload, int $timestamp): string
     {
         $v1 = hash_hmac('sha256', $timestamp . '.' . $payload, self::SECRET);

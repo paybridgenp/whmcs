@@ -15,6 +15,8 @@
 #   Configuration → System Settings → General, so callback URLs resolve
 #   externally.
 
+name: paybridgenp-whmcs-local
+
 services:
   whmcs:
     # Built from Dockerfile.whmcs: PHP 8.2 + ionCube + Apache.
@@ -41,6 +43,7 @@ services:
       MYSQL_USER: whmcs
       MYSQL_PASSWORD: whmcs
       MYSQL_DATABASE: whmcs
+      PAYBRIDGENP_API_BASE: http://host.docker.internal:3000
     depends_on:
       - db
 

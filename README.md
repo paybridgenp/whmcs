@@ -1,6 +1,6 @@
 # PayBridgeNP for WHMCS
 
-Official [PayBridgeNP](https://paybridgenp.com) gateway module for WHMCS. Accept **eSewa** and **Khalti** payments on invoices inside your WHMCS billing panel with a single integration, plus refunds from admin (note: eSewa refunds enter a `requires_action` state and finalize out of band, so they are not instant).
+Official [PayBridgeNP](https://paybridgenp.com) gateway module for WHMCS. Accept **eSewa**, **Khalti**, and configured **Fonepay** payments on invoices inside your WHMCS billing panel with a single integration, plus refunds from admin (note: eSewa refunds enter a `requires_action` state and finalize out of band, so they are not instant).
 
 <p align="center">
   <img src="modules/gateways/paybridgenp/logo.png" alt="PayBridgeNP logo" width="96" height="96" />
@@ -12,7 +12,7 @@ Official [PayBridgeNP](https://paybridgenp.com) gateway module for WHMCS. Accept
 
 ## Install in 5 minutes
 
-1. Download the latest `paybridgenp-whmcs-*.zip` from [Releases](https://github.com/paybridgenp/whmcs/releases/latest) - about 65 KB, the PayBridgeNP PHP SDK is vendored inside so you don't need Composer.
+1. Download the latest `paybridgenp-whmcs-*.zip` from [Releases](https://github.com/paybridgenp/whmcs/releases/latest) - about 84 KB, the PayBridgeNP PHP SDK is vendored inside so you don't need Composer.
 2. Extract the ZIP at the root of your WHMCS install (the directory containing `configuration.php`). Files merge into `modules/gateways/`.
 3. In WHMCS admin, go to **Configuration → System Settings → Payment Gateways → All Payment Gateways**, find **PayBridgeNP**, click **Activate**.
 4. Paste your test or live API key (`sk_test_…` / `sk_live_…`) and your webhook signing secret (`whsec_…`) from the [PayBridgeNP dashboard](https://dashboard.paybridgenp.com).
@@ -26,7 +26,7 @@ Full setup walkthrough with screenshots: [docs.paybridgenp.com/integrations/whmc
 
 ## Features
 
-- **eSewa + Khalti in one module.** No per-method configuration, no duplicate webhooks.
+- **eSewa + Khalti + Fonepay in one module.** Let the payer choose from your available methods, or force one provider. No duplicate webhooks.
 - **Refunds inside admin.** Click Refund on any transaction - partial refunds supported. Calls PayBridgeNP's refund API directly. eSewa refunds enter `requires_action` and finalize out of band; confirm completion in the PayBridgeNP dashboard.
 - **HMAC-signed webhooks** with a 5-minute replay window. Unsigned events rejected with HTTP 400.
 - **Idempotent payment application** via `checkCbTransID` - replayed webhooks never double-post.
@@ -75,7 +75,7 @@ composer install
 composer test
 ```
 
-26 PHPUnit tests cover HMAC signature verification (valid, tampered, replay, missing, wrong-secret, malformed), amount paisa conversion, WHMCS-params → checkout-request mapping, config fallbacks, and logger secret scrubbing.
+36 PHPUnit tests cover HMAC signature verification (including the canonical callback header), amount paisa conversion, WHMCS-params → checkout-request mapping, config fallbacks, and logger secret scrubbing.
 
 ## Local development with Docker
 

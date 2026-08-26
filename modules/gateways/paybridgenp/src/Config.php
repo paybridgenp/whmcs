@@ -41,6 +41,17 @@ final class Config
         return (string) ($this->params['secretKey'] ?? '');
     }
 
+    /** @return array{api_key:string, base_url?:string} */
+    public function sdkConfig(): array
+    {
+        $config  = ['api_key' => $this->apiKey()];
+        $baseUrl = trim((string) getenv('PAYBRIDGENP_API_BASE'));
+        if ($baseUrl !== '') {
+            $config['base_url'] = rtrim($baseUrl, '/');
+        }
+        return $config;
+    }
+
     public function webhookSecret(): string
     {
         return (string) ($this->params['webhookSecret'] ?? '');
@@ -48,12 +59,12 @@ final class Config
 
     /**
      * `auto` = let the payer pick on the PayBridgeNP hosted page.
-     * `esewa` / `khalti` = force a single method upstream.
+     * `esewa` / `khalti` / `fonepay` = force a single method upstream.
      */
     public function paymentMethod(): string
     {
         $method = (string) ($this->params['paymentMethod'] ?? 'auto');
-        return in_array($method, ['auto', 'esewa', 'khalti'], true) ? $method : 'auto';
+        return in_array($method, ['auto', 'esewa', 'khalti', 'fonepay'], true) ? $method : 'auto';
     }
 
     public function debugLogging(): bool

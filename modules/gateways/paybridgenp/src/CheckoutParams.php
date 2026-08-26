@@ -21,6 +21,7 @@ final class CheckoutParams
      *   return_url: string,
      *   cancel_url: string,
      *   provider?: string,
+     *   customer?: array<string,mixed>,
      *   metadata: array<string,mixed>
      * }
      */
@@ -28,6 +29,7 @@ final class CheckoutParams
     {
         $invoiceId = (int) ($params['invoiceid'] ?? 0);
         $callback  = rtrim($config->callbackBaseUrl(), '/') . '/modules/gateways/callback/paybridgenp.php';
+        $client    = is_array($params['clientdetails'] ?? null) ? $params['clientdetails'] : [];
 
         // WHMCS supplies the amount pre-converted to the gateway's configured
         // convertto currency when multi-currency is enabled; we treat whatever
@@ -46,10 +48,33 @@ final class CheckoutParams
                 'invoiceid'      => (string) $invoiceId,
                 'source'         => 'whmcs',
                 'whmcs_version'  => (string) ($params['whmcsVersion'] ?? ''),
-                'client_id'      => (string) ($params['clientdetails']['userid'] ?? ''),
-                'client_email'   => (string) ($params['clientdetails']['email'] ?? ''),
+                'client_id'      => (string) ($client['userid'] ?? ''),
+                'client_email'   => (string) ($client['email'] ?? ''),
             ],
         ];
+
+        $nonEmpty = static function ($value): bool {
+            return trim((string) $value) !== '';
+        };
+        $customer = array_filter([
+            'name'  => trim((string) ($client['firstname'] ?? '') . ' ' . (string) ($client['lastname'] ?? '')),
+            'email' => (string) ($client['email'] ?? ''),
+            'phone' => (string) ($client['phonenumber'] ?? ''),
+        ], $nonEmpty);
+        $address = array_filter([
+            'line1'      => (string) ($client['address1'] ?? ''),
+            'line2'      => (string) ($client['address2'] ?? ''),
+            'city'       => (string) ($client['city'] ?? ''),
+            'state'      => (string) ($client['state'] ?? ''),
+            'postalCode' => (string) ($client['postcode'] ?? ''),
+            'country'    => (string) ($client['countrycode'] ?? $client['country'] ?? ''),
+        ], $nonEmpty);
+        if (!empty($address['line1']) && !empty($address['city'])) {
+            $customer['address'] = $address;
+        }
+        if ($customer !== []) {
+            $body['customer'] = $customer;
+        }
 
         $method = $config->paymentMethod();
         if ($method !== 'auto') {

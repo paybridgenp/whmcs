@@ -101,9 +101,10 @@ function paybridgenp_config(): array
             'FriendlyName' => 'Payment Method',
             'Type'         => 'dropdown',
             'Options'      => [
-                'auto'   => 'Let payer choose (eSewa or Khalti)',
+                'auto'   => 'Let payer choose from available methods',
                 'esewa'  => 'eSewa only',
                 'khalti' => 'Khalti only',
+                'fonepay' => 'Fonepay only',
             ],
             'Default'      => 'auto',
             'Description'  => 'What to show on the hosted checkout page.',
@@ -181,7 +182,7 @@ function paybridgenp_create_and_redirect(array $params, Config $config, Logger $
     }
 
     try {
-        $pb   = new PayBridgeNP(['api_key' => $config->apiKey()]);
+        $pb   = new PayBridgeNP($config->sdkConfig());
         $body = CheckoutParams::build($params, $config);
 
         $logger->debug('checkout.request', $body);
@@ -272,7 +273,7 @@ function paybridgenp_refund(array $params): array
     }
 
     try {
-        $pb      = new PayBridgeNP(['api_key' => $config->apiKey()]);
+        $pb      = new PayBridgeNP($config->sdkConfig());
         $invoice = (int) ($params['invoiceid'] ?? 0);
         // PayBridgeNP requires `reason` to be one of an enum. WHMCS has no
         // concept of refund taxonomy, so we default to `other` and put the

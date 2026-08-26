@@ -9,6 +9,16 @@ use PHPUnit\Framework\TestCase;
 
 final class ConfigTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        putenv('PAYBRIDGENP_API_BASE');
+    }
+
+    protected function tearDown(): void
+    {
+        putenv('PAYBRIDGENP_API_BASE');
+    }
+
     public function test_live_key_used_when_test_mode_off(): void
     {
         $c = new Config([
@@ -43,10 +53,33 @@ final class ConfigTest extends TestCase
         $this->assertSame('sk_live_abc', $c->apiKey());
     }
 
+    public function test_sdk_config_uses_local_api_override_when_set(): void
+    {
+        putenv('PAYBRIDGENP_API_BASE=http://host.docker.internal:3000/');
+
+        $this->assertSame([
+            'api_key' => 'sk_test_xyz',
+            'base_url' => 'http://host.docker.internal:3000',
+        ], (new Config(['testMode' => 'on', 'testSecretKey' => 'sk_test_xyz']))->sdkConfig());
+    }
+
+    public function test_sdk_config_defaults_to_production_api(): void
+    {
+        $this->assertSame([
+            'api_key' => 'sk_live_abc',
+        ], (new Config(['secretKey' => 'sk_live_abc']))->sdkConfig());
+    }
+
     public function test_payment_method_rejects_unknown_values(): void
     {
         $c = new Config(['paymentMethod' => 'paypal']);
         $this->assertSame('auto', $c->paymentMethod());
+    }
+
+    public function test_payment_method_accepts_fonepay(): void
+    {
+        // Catches Fonepay being offered in WHMCS config but silently falling back to auto.
+        $this->assertSame('fonepay', (new Config(['paymentMethod' => 'fonepay']))->paymentMethod());
     }
 
     public function test_system_url_always_has_trailing_slash(): void

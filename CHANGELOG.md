@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.0
+
+- Add a Fonepay-only payment-method option and make the default chooser describe all configured providers.
+- Vendor the local `paybridge-np/sdk` 5.5.0 for the next package build.
+
 All notable changes to the PayBridgeNP WHMCS module.
 
 ## [0.2.0] — 2026-05-02

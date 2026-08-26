@@ -76,7 +76,7 @@ In the PayBridgeNP dashboard, register a webhook pointing at:
 ```
 https://<tunnel-url>/modules/gateways/callback/paybridgenp.php
 ```
-Subscribe to `payment.succeeded`, `payment.failed`, `payment.cancelled`.
+Subscribe to `payment.succeeded`, `payment.failed`.
 
 ## 7. End-to-end test
 
@@ -87,7 +87,7 @@ Create a test invoice, "Pay Now", complete with eSewa sandbox. Watch:
 
 ## Editing and iterating
 
-The Docker stack mounts our module **read-only** from the monorepo. Edit any file under `packages/whmcs/modules/` and the next page load picks it up. No rebuild.
+The Docker stack mounts the module **read-only** from this checkout. Edit any file under `modules/` and the next page load picks it up. No rebuild.
 
 If you edit `modules/gateways/paybridgenp/src/*.php` and classes aren't found:
 

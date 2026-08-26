@@ -27,7 +27,19 @@ final class CheckoutParamsTest extends TestCase
             'amount'        => '100.00',
             'currency'      => 'NPR',
             'whmcsVersion'  => '8.13.0',
-            'clientdetails' => ['userid' => 7, 'email' => 'a@b.com'],
+            'clientdetails' => [
+                'userid' => 7,
+                'firstname' => 'Aarav',
+                'lastname' => 'Sharma',
+                'email' => 'a@b.com',
+                'phonenumber' => '9800000000',
+                'address1' => 'Balaju',
+                'address2' => '',
+                'city' => 'Kathmandu',
+                'state' => 'Bagmati',
+                'postcode' => '44600',
+                'countrycode' => 'NP',
+            ],
         ], $overrides);
     }
 
@@ -51,6 +63,28 @@ final class CheckoutParamsTest extends TestCase
         $this->assertSame('8.13.0',    $body['metadata']['whmcs_version']);
         $this->assertSame('7',         $body['metadata']['client_id']);
         $this->assertSame('a@b.com',   $body['metadata']['client_email']);
+        $this->assertSame([
+            'name' => 'Aarav Sharma',
+            'email' => 'a@b.com',
+            'phone' => '9800000000',
+            'address' => [
+                'line1' => 'Balaju',
+                'city' => 'Kathmandu',
+                'state' => 'Bagmati',
+                'postalCode' => '44600',
+                'country' => 'NP',
+            ],
+        ], $body['customer']);
+    }
+
+    public function test_omits_empty_customer_details(): void
+    {
+        $body = CheckoutParams::build(
+            $this->makeParams(['clientdetails' => ['userid' => 7]]),
+            $this->makeConfig()
+        );
+
+        $this->assertArrayNotHasKey('customer', $body);
     }
 
     public function test_forces_provider_when_method_configured(): void
@@ -60,6 +94,16 @@ final class CheckoutParamsTest extends TestCase
             $this->makeConfig(['paymentMethod' => 'khalti'])
         );
         $this->assertSame('khalti', $body['provider']);
+    }
+
+    public function test_forces_fonepay_when_configured(): void
+    {
+        // Catches the new Fonepay setting being accepted but omitted from checkout requests.
+        $body = CheckoutParams::build(
+            $this->makeParams(),
+            $this->makeConfig(['paymentMethod' => 'fonepay'])
+        );
+        $this->assertSame('fonepay', $body['provider']);
     }
 
     public function test_currency_is_uppercased(): void
