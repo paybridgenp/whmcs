@@ -2,9 +2,9 @@
 Contributors: paybridgenp
 Tags: whmcs, payment-gateway, nepal, esewa, khalti, fonepay
 Requires at least: WHMCS 8.0
-Tested up to: WHMCS 8.13
+Tested up to: WHMCS 9.0
 Requires PHP: 7.4
-Stable tag: 0.3.0
+Stable tag: 0.3.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -27,9 +27,11 @@ PayBridgeNP is a payment gateway for Nepal. This module connects WHMCS to PayBri
 
 1. Download `paybridgenp-whmcs-<version>.zip` from the PayBridgeNP GitHub releases page.
 2. Extract at the root of your WHMCS installation — files merge into `modules/gateways/`.
-3. Log in to WHMCS admin → **Configuration → System Settings → Payment Gateways**.
-4. Under **All Payment Gateways**, click **PayBridgeNP** and **Activate**.
-5. Enter your **Secret Key** (`sk_live_…` from https://app.paybridgenp.com) and the **Webhook Signing Secret** (`whsec_…`). Save.
+3. Log in to WHMCS admin and open the gateway list:
+   - WHMCS 9.0 and newer: **Configuration → Apps & Integrations → Browse → Payments**.
+   - WHMCS 8.x: **Configuration → System Settings → Payment Gateways → All Payment Gateways**.
+4. Click **PayBridgeNP**, then **Activate**.
+5. Enter your **Secret Key** (`sk_live_…` from https://dashboard.paybridgenp.com) and the **Webhook Signing Secret** (`whsec_…`). Save.
 6. In your PayBridgeNP dashboard, register a webhook pointing at:
    `https://your-whmcs-url/modules/gateways/callback/paybridgenp.php`
 7. Enable the `payment.succeeded` and `payment.failed` events.
@@ -46,6 +48,15 @@ NPR only. Non-NPR invoices will be rejected by the API with a clear error.
 Yes. By default the payer picks from the methods available for your PayBridgeNP project. You can also force eSewa, Khalti, or Fonepay in the module settings. Fonepay appears when it is configured and enabled for the active mode.
 
 == Changelog ==
+
+= 0.3.1 =
+
+* Corrected the install steps for WHMCS 9.0. WHMCS 9.0 removed the "All Payment
+  Gateways" tab; the gateway is now activated from Apps & Integrations. The 8.x
+  path is still documented for older installs.
+* Fixed a broken link in the setup steps. Secret keys live at
+  dashboard.paybridgenp.com; the address previously printed here does not exist.
+* Verified against WHMCS 9.0. No functional changes to the module.
 
 = 0.3.0 =
 * Added: Fonepay-only checkout option. The default chooser now accurately offers every provider available for the project.

@@ -1,0 +1,69 @@
+# PayBridgeNP WHMCS — isolated WHMCS 9.0.7 compatibility stack.
+#
+# Purpose: prove (or disprove) that the module works on WHMCS 9.x before
+# ticking the 9.0 boxes on the WHMCS Marketplace listing. A false
+# compatibility claim on a payment module means a merchant installs it and
+# their invoices silently stop being payable.
+#
+# Deliberately parallel to docker-compose.yml, NOT a replacement:
+#   - its own project name, so containers never collide
+#   - its own source dir (whmcs-src-907) and DB dir (db-data-907)
+#   - its own ports (8081 / 8026 / 1026)
+# The 8.13 stack and its database are left completely untouched.
+#
+# Usage:
+#   docker compose -f docker-compose.907.yml up -d
+#   open http://localhost:8081/install/install.php
+#
+# Tear down (keeps data):      docker compose -f docker-compose.907.yml down
+# Tear down (wipes DB):        docker compose -f docker-compose.907.yml down -v
+# Reclaim disk when finished:  rm -rf whmcs-src-907 db-data-907
+
+name: paybridgenp-whmcs-907
+
+services:
+  whmcs:
+    build:
+      context: .
+      dockerfile: Dockerfile.whmcs
+    image: paybridgenp-whmcs-dev
+    container_name: paybridgenp-whmcs-907
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./whmcs-src-907:/var/www/whmcs
+      # Same live-mount of the module under test as the 8.13 stack, so we are
+      # testing the exact files that ship in the 0.3.0 ZIP.
+      - ../modules/gateways/paybridgenp.php:/var/www/whmcs/modules/gateways/paybridgenp.php:ro
+      - ../modules/gateways/paybridgenp:/var/www/whmcs/modules/gateways/paybridgenp:ro
+      - ../modules/gateways/callback/paybridgenp.php:/var/www/whmcs/modules/gateways/callback/paybridgenp.php:ro
+    environment:
+      VIRTUAL_HOST: localhost
+      MYSQL_HOST: db
+      MYSQL_USER: whmcs
+      MYSQL_PASSWORD: whmcs
+      MYSQL_DATABASE: whmcs
+      PAYBRIDGENP_API_BASE: http://host.docker.internal:3000
+    depends_on:
+      - db
+
+  db:
+    image: mariadb:10.11
+    container_name: paybridgenp-whmcs-907-db
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: whmcs
+      MARIADB_DATABASE: whmcs
+      MARIADB_USER: whmcs
+      MARIADB_PASSWORD: whmcs
+    volumes:
+      - ./db-data-907:/var/lib/mysql
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: paybridgenp-whmcs-907-mailhog
+    restart: unless-stopped
+    ports:
+      - "8026:8025"
+      - "1026:1025"

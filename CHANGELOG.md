@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.1
+
+- Correct the install steps for WHMCS 9.0, which removed the "All Payment
+  Gateways" tab. The gateway is activated from Apps & Integrations there; the
+  8.x path stays documented for older installs.
+- Fix a dead link in the setup steps: secret keys are at
+  dashboard.paybridgenp.com, not the address previously printed.
+- Verified end-to-end against WHMCS 9.0.7. No functional changes.
+
 ## 0.3.0
 
 - Add a Fonepay-only payment-method option and make the default chooser describe all configured providers.

@@ -12,6 +12,9 @@ dist/
 # Local WHMCS source for Docker dev loop (never commit)
 docker/whmcs-src/
 docker/db-data/
+# Isolated WHMCS 9.x compatibility stack (licensed source + its DB)
+docker/whmcs-src-907/
+docker/db-data-907/
 
 # IDE / OS
 .idea/
@@ -20,3 +23,4 @@ docker/db-data/
 
 # PHPUnit result cache
 .phpunit.result.cache
+.gstack/

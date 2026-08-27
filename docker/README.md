@@ -97,6 +97,37 @@ cd packages/whmcs && composer dump-autoload
 
 (The vendor dir is live-mounted too — the reload is just for the classmap file.)
 
+## Testing against WHMCS 9.x
+
+`docker-compose.907.yml` is a second, isolated stack for major-version
+compatibility checks. It has its own project name, source dir
+(`whmcs-src-907/`), database (`db-data-907/`), and does not touch the 8.13
+stack or its data.
+
+```bash
+unzip ~/Downloads/whmcs_v9XX_full.zip -d whmcs-src-907/
+mv whmcs-src-907/whmcs/* whmcs-src-907/ && rmdir whmcs-src-907/whmcs
+docker compose -f docker-compose.907.yml up -d --build
+open http://localhost:8080/install/install.php
+```
+
+**Two traps, both cost time on 2026-08-28:**
+
+1. **A fresh install rebinds your dev license.** WHMCS ties a license to the
+   install, not just the domain, so a second install fails with "Invalid
+   License" until you reissue at whmcs.com/members/clientarea.php. Reissuing
+   invalidates the *other* install until you reissue back. Changing the port
+   does not help — it is the install identity, not the location.
+2. **The global `encrypt()` helper is NOT the gateway-config encryption.**
+   Writing settings into `tblpaymentgateways` with `encrypt()` produces values
+   `getGatewayVariables()` cannot decrypt. Set gateway settings through the
+   admin form (submitting it from the page works; the field order in the DOM
+   does not match the visual order, so target inputs by
+   `name="field[<key>]"`, never by position).
+
+WHMCS 9.0 also moved gateway activation: **Apps & Integrations → Browse →
+Payments**, not the old "All Payment Gateways" tab, which no longer exists.
+
 ## Tear down
 
 ```bash

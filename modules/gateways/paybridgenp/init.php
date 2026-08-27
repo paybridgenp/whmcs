@@ -9,7 +9,7 @@
 declare(strict_types=1);
 
 if (!defined('PAYBRIDGENP_WHMCS_VERSION')) {
-    define('PAYBRIDGENP_WHMCS_VERSION', '0.3.0');
+    define('PAYBRIDGENP_WHMCS_VERSION', '0.3.1');
 }
 
 $vendorAutoload = __DIR__ . '/vendor/autoload.php';
